@@ -19,9 +19,9 @@ app.post("/", async (c) => {
     return c.text("invalid webhook secret", 401);
   }
 
-  const { body } = await c.req.json();
+  const { type, body } = await c.req.json();
 
-  if (body?.note.text === "いまのなし") {
+  if (type === "note" && body?.note.text === "いまのなし") {
     const notes = await misskey.request("users/notes", {
       userId: body?.note.userId,
       limit: 2,
