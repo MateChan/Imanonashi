@@ -2,5 +2,9 @@
   "imports": {
     "hono/": "https://deno.land/x/hono@v4.2.7/",
     "misskey-js": "npm:misskey-js"
+  },
+  "tasks": {
+    "dev": "deno run --allow-net --allow-read --allow-env --env --watch main.ts",
+    "start": "deno run --allow-net --allow-read --allow-env --env main.ts"
   }
 }
