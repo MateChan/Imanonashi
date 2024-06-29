@@ -1,5 +1,22 @@
 import { Hono } from "hono/mod.ts";
 import { api } from "misskey-js";
+import { Note, User } from "misskey-js/entities";
+
+type Webhook =
+  & {
+    server: string;
+    hookId: string;
+    userId: string;
+    eventId: string;
+    createdAt: string;
+  }
+  & ({
+    type: "follow" | "followed" | "unfollow";
+    body: { user: User };
+  } | {
+    type: "note" | "renote" | "reply" | "mention";
+    body: { note: Note };
+  });
 
 const {
   MISSKEY_HOSTNAME,
@@ -19,11 +36,11 @@ app.post("/", async (c) => {
     return c.text("invalid webhook secret", 401);
   }
 
-  const { type, body } = await c.req.json();
+  const { type, body }: Webhook = await c.req.json();
 
-  if (type === "note" && body?.note.text === "いまのなし") {
+  if (type === "note" && body.note.text === "いまのなし") {
     const notes = await misskey.request("users/notes", {
-      userId: body?.note.userId,
+      userId: body.note.userId,
       limit: 2,
     });
     misskey.request("notes/delete", { noteId: notes[1].id });
