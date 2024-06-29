@@ -38,12 +38,19 @@ app.post("/", async (c) => {
 
   const { type, body }: Webhook = await c.req.json();
 
-  if (type === "note" && body.note.text === "いまのなし") {
-    const notes = await misskey.request("users/notes", {
-      userId: body.note.userId,
-      limit: 2,
-    });
-    misskey.request("notes/delete", { noteId: notes[1].id });
+  if (type === "note") {
+    const { text, id: noteId } = body.note;
+    if (text === "いまのなし") {
+      const notes = await misskey.request("users/notes", {
+        userId: body.note.userId,
+        limit: 2,
+      });
+      misskey.request("notes/delete", { noteId: notes[1].id });
+    } else if (text?.endsWith("すぐ消す")) {
+      setTimeout(() => {
+        misskey.request("notes/delete", { noteId });
+      }, 60 * 1000);
+    }
   }
 
   return c.text("ok");
